@@ -1,0 +1,6 @@
+export('initializeFeed','updateFeed')
+export('drawUsersIGraph','drawWordIGraph') 
+export('ntwitterPerTimeFrame','sentimentFeedByTime') 
+export('wordCloudAnalysis','wordCloudMultipleComparison')
+export('wordCloudMultiple')
+export('sentimentFeedPunggol')

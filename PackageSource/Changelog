@@ -1,0 +1,11 @@
+30/10/2012
+	* RevoTwitter for ActiveCitizen.com  
+2/11/2012
+	* Added Analytics Functionality
+19/11/2012
+	* Bug Fixes - Remove whitespaces in SearchString
+	* Bug Fixes - Plot Error Msg if too few tweets
+22/01/2013
+	* New SentimentFeedByTime features
+	* New SentimentFeedPunggol function
+	* Minor bug fixes with plots and wordclouds

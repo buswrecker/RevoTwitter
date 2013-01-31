@@ -1,0 +1,33 @@
+Package: RevoTwitter
+Type: Package
+Title: RevoTwitter to populate sqlite database
+Version: 0.2.2
+Date: 19/1/2013
+Author: Revolution Analytics
+Maintainer: Julian Lee <julian.lee@revolutionanalytics.com>
+Depends:
+    R (>= 2.8.1),
+    twitteR,
+    tm,
+    XML,
+    DBI,
+    TTR,RSQLite,stringr,igraph,plyr
+Description: This package provides all the functionality required to run
+    activecitizen.com
+License: GPL-3
+LazyLoad: Yes
+Collate:
+    'initializeFeed.R'
+    'updateFeed.R'
+    'onLoad.R'
+    'RemoveFunctions.R'
+    'score.sentiment.R'
+    'drawUsersIGraph.R'
+    'drawWordIGraph.R'
+    'ntwitterPerTimeFrame.R'
+    'sentimentFeedByTime.R'
+		'sentimentFeedPunggol.R'
+    'wordCloudAnalysis.R'
+    'wordCloudMultiple.R'
+    'RevoTwitter-package.R'
+    'wordCloudMultipleComparison.R'
