@@ -33,9 +33,10 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-
-
-sentimentFeedByTime <- function(searchString,startDate, endDate, window=2, timeframe='hour'){
+sentimentFeedByTime <- function(conn=NULL,searchString,startDate, endDate, window=2, timeframe='hour'){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(ggplot2)
   require(TTR)
@@ -45,16 +46,13 @@ sentimentFeedByTime <- function(searchString,startDate, endDate, window=2, timef
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT created,score,searchString from ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(con,x)))
+  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##Check volume of data
   if(nrow(tweetData) < 5){

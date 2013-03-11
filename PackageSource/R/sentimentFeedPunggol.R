@@ -34,7 +34,10 @@
 
 
 
-sentimentFeedPunggol <- function(searchString, startDate, endDate, window=2){
+sentimentFeedPunggol <- function(conn=NULL,searchString, startDate, endDate, window=2){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(ggplot2)
   require(TTR)
@@ -44,16 +47,13 @@ sentimentFeedPunggol <- function(searchString, startDate, endDate, window=2){
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT text,created,score,searchString from ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(con,x)))
+  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##PAP
   pap <- grep('[pP][aA][pP] | [kK][oO][hH]',tweetData$text)
@@ -96,5 +96,3 @@ sentimentFeedPunggol <- function(searchString, startDate, endDate, window=2){
   pp <- pp + scale_x_datetime(labels=date_format('%m/%d %H')) +  opts(title=paste('Moving Average,n=',window,sep=''))
   pp
 }
-              
-  

@@ -34,7 +34,10 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-wordCloudAnalysis <- function(searchString,focusString=NULL,startDate,endDate,type='ALL',...){
+wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,endDate,type='ALL',...){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(wordcloud)
   
@@ -47,17 +50,14 @@ wordCloudAnalysis <- function(searchString,focusString=NULL,startDate,endDate,ty
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT text,score FROM ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- dbGetQuery(con,SQLstatement)
-  ##tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(con,x)))
+  tweetData <- dbGetQuery(conn,SQLstatement)
+  ##tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##If focusstring is not null
   if(!is.null(focusString)){

@@ -2,9 +2,10 @@
 \alias{wordCloudMultiple}
 \title{Draw a Collective WordCloud from all searchStrings}
 \usage{
-  wordCloudMultiple(searchString)
+  wordCloudMultiple(conn = NULL, searchString)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character vector to be wordclouded}
 }
 \value{

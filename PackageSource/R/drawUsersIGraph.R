@@ -18,21 +18,25 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #' Draws Retweet Graph
-#' 
-#' This function will take in an string of the XDF file location and return TRUE if 
+#'
+#' This function will take in an string of the XDF file location and return TRUE if
 #' successfully updated twitterFeeds
 #'
-#' @param searchString A character string to be wordclouded 
+#' @param searchString A character string to be wordclouded
 #' @param startDate A character string of the start date, eg "2012-12-30"
-#' @param endDate A character string of the end date, eg "2012-12-30" 
+#' @param endDate A character string of the end date, eg "2012-12-30"
 #'
 #' @return NULL
-#' 
+#'
 #' @seealso \code{\link{drawWordIGraph}}
-#' 
+#'
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
-#' 
-drawUsersIGraph <- function(searchString,startDate,endDate){
+#'
+drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
+
   require(igraph)
   require(stringr)
   
@@ -40,16 +44,13 @@ drawUsersIGraph <- function(searchString,startDate,endDate){
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT text, screenName from ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- dbGetQuery(con, SQLstatement)
+  tweetData <- dbGetQuery(conn, SQLstatement)
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##Check volume of data
   if(nrow(tweetData) < 10){
@@ -59,7 +60,7 @@ drawUsersIGraph <- function(searchString,startDate,endDate){
   }
   
   ##rt_patterns
-  rt_patterns = grep("(RT|via)((?:\\b\\W*@\\w+)+)", 
+  rt_patterns = grep("(RT|via)((?:\\b\\W*@\\w+)+)",
                      tweetData$text, ignore.case=TRUE)
   
   # create list to store user names
@@ -67,20 +68,19 @@ drawUsersIGraph <- function(searchString,startDate,endDate){
   who_post = list(1:length(rt_patterns))
   
   for (i in 1:length(rt_patterns))
-  { 
+  {
     # get tweet with retweet entity
     twit = tweetData$text[rt_patterns[i]]
-    # get retweet source 
+    # get retweet source
     poster = str_extract_all(twit,
-                             "(RT|via)((?:\\b\\W*@\\w+)+)") 
+                             "(RT|via)((?:\\b\\W*@\\w+)+)")
     #remove ':'
-    poster = gsub(":", "", unlist(poster)) 
+    poster = gsub(":", "", unlist(poster))
     # name of retweeted user
-    who_post[[i]] = gsub("(RT @|via @)", "", poster, ignore.case=TRUE) 
-    # name of retweeting user 
-    who_retweet[[i]] = rep(tweetData$screenName[rt_patterns[i]], length(poster)) 
+    who_post[[i]] = gsub("(RT @|via @)", "", poster, ignore.case=TRUE)
+    # name of retweeting user
+    who_retweet[[i]] = rep(tweetData$screenName[rt_patterns[i]], length(poster))
   }
-  
   
   # unlist
   who_post = unlist(who_post)
@@ -95,7 +95,6 @@ drawUsersIGraph <- function(searchString,startDate,endDate){
   # get vertex names
   ver_labs = get.vertex.attribute(rt_graph, "name", index=V(rt_graph))
   ver_labs <- tolower(substring(ver_labs,0,11))
-  
   
   # choose some layout
   glay = layout.fruchterman.reingold(rt_graph)
@@ -113,5 +112,4 @@ drawUsersIGraph <- function(searchString,startDate,endDate){
   plot(rt_graph,layout=glay)
   title(paste("\nFollowers on",searchString),
         cex.main=1, col.main="black")
-  
-} 
+}

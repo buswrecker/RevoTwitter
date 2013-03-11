@@ -2,9 +2,10 @@
 \alias{wordCloudMultipleComparison}
 \title{Draw a Comparison WordCloud}
 \usage{
-  wordCloudMultipleComparison(searchString)
+  wordCloudMultipleComparison(conn = NULL, searchString)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character vector to be wordclouded}
 }
 \value{

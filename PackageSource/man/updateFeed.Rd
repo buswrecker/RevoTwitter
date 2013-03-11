@@ -2,12 +2,12 @@
 \alias{updateFeed}
 \title{Update Twitter Feed}
 \usage{
-  updateFeed(searchString, N = 100)
+  updateFeed(conn = NULL, searchString, N = 100)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{The \code{searchString} that is to be
   updated}
-
   \item{N}{Number of feeds to populate}
 }
 \value{

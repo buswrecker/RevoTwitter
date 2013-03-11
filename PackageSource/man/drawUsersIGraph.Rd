@@ -2,9 +2,10 @@
 \alias{drawUsersIGraph}
 \title{Draws Retweet Graph}
 \usage{
-  drawUsersIGraph(searchString, startDate, endDate)
+  drawUsersIGraph(conn = NULL, searchString, startDate, endDate)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character string to be wordclouded}
 
   \item{startDate}{A character string of the start date, eg

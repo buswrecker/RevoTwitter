@@ -14,15 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-#' Initialize Twitter Feed into SQLite
+#' Initialize Twitter Feed in database
 #' 
 #' This function will take in a \code{searchString} and return TRUE if 
-#' successfully obtained twitterFeeds. TwitterFeeds are stored into an SQLite file
-#' \code{options('revoSQLiteFile')} will reveal location of SQLitefile.
+#' successfully obtained twitterFeeds. TwitterFeeds are stored into database
 #' TableName is as the searchString
 #'
 #' @param searchString A string that is to be searched on Twitter. 
-#' @param N Number of initialize feeds to populate the SQLites
+#' @param N Number of initialize feeds to populate the database
 #'
 #' @return Boolean. TRUE if pull from twitter is successful, FALSE otherwise
 #' 
@@ -30,7 +29,10 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-initializeFeed <- function(searchString,N=1500){
+initializeFeed <- function(conn=NULL, searchString, N=1500){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   data(dictionary)
   
@@ -43,9 +45,8 @@ initializeFeed <- function(searchString,N=1500){
   
   tweetData <- twListToDF(tweetData)
   
-  ##Prepare to Export Out to SQLite
+  ##Prepare to Export Out to database
   tableName <- tolower(gsub('\\s|@*#*','',searchString))
-  TwitterSQLITE <- options('revoSQLiteFile')[[1]]
   
   ##Remove non-ASCII characters that would screw up tm
   grepList <-grep('[\x80-\xFF]',tweetData$text,useBytes=T)
@@ -84,13 +85,9 @@ initializeFeed <- function(searchString,N=1500){
   ##Order the Tweets from Earliest to Latest
   tweetData <- tweetData[order(tweetData$created),]
   
-  ###Pump out to SQLITE
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname =TwitterSQLITE)
-  
   ##Check if write was successful
   ##Ensure that field types are correct
-  SUCCESS <- dbWriteTable(con, tableName, tweetData,
+  SUCCESS <- dbWriteTable(conn, tableName, tweetData,
                 row.names=F,
                 field.types=list(text='TEXT',favourited='INTEGER',
                   replyToSN='INTEGER',created='DATETIME',truncated='INTEGER',
@@ -98,7 +95,7 @@ initializeFeed <- function(searchString,N=1500){
                   statusSource='TEXT',screenName='TEXT',
                   score='INTEGER',searchString='TEXT'))
   
-  dbDisconnect(con)
-  
+  dbDisconnect(conn)
+
   return(SUCCESS)
 }

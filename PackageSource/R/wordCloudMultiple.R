@@ -32,7 +32,10 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 #' 
-wordCloudMultiple <- function(searchString){
+wordCloudMultiple <- function(conn=NULL,searchString){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(wordcloud)
   
@@ -40,15 +43,12 @@ wordCloudMultiple <- function(searchString){
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT created,text,searchString from ',tableName,
                         "ORDER BY id DESC limit 20")
   
-  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(con,x)))
+  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   compileTweets <- daply(tweetData,'searchString',function(x) return(paste(x$text,collapse=';'))) 
   

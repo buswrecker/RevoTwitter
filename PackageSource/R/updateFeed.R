@@ -20,7 +20,6 @@
 #' Update Twitter Feed
 #' 
 #' This function will take in the searchString and update the TwitterFeed
-#' on SQLite
 #' 
 #'
 #' @param searchString The \code{searchString} that is to be updated 
@@ -32,20 +31,18 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-updateFeed <- function(searchString,N=100){
+updateFeed <- function(conn=NULL,searchString,N=100){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   ##Load Pos/Neg word dictionary
   data(dictionary)
   
-  ##Set the SQLiteFile
   tableName <- tolower(gsub('\\s|@*#*','',searchString))
-  TwitterSQLITE <- options('revoSQLiteFile')[[1]]
-  
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname =TwitterSQLITE)
   
   ##Check if table is in the database
-  if(!tableName %in% dbListTables(con)){
+  if(!tableName %in% dbListTables(conn)){
     cat('No such table in database\n')
     return(FALSE)
   }
@@ -53,9 +50,9 @@ updateFeed <- function(searchString,N=100){
   SQLstatement <- paste("SELECT id from",tableName,
                        "ORDER BY id DESC limit 1")
   
-  rs <- dbGetQuery(con, SQLstatement)
+  rs <- dbGetQuery(conn, SQLstatement)
   ##dbClearResult(rs)
-    
+  
   tweetData <- searchTwitter(searchString,n=N,lan='en',
           sinceID=rs$id[1])
   
@@ -107,9 +104,9 @@ updateFeed <- function(searchString,N=100){
   ##Order the Tweets from Earliest to Latest
   tweetData <- tweetData[order(tweetData$created),]
   
-  SUCCESS <- dbWriteTable(con,tableName,tweetData,append=T,
+  SUCCESS <- dbWriteTable(conn,tableName,tweetData,append=T,
                           row.names=F)
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   return(SUCCESS)
 }

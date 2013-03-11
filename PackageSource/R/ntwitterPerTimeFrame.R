@@ -30,23 +30,23 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-ntwitterPerTimeFrame <- function(searchString,startDate,endDate,timeframe='hour'){
+ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timeframe='hour'){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(ggplot2)
   
   ##0.1.1 - remove white spaces
   tableName <- gsub('\\s|@*#*','',searchString)
   
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT created,searchString from ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(con,x)))
+  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##Check volume of data
   if(nrow(tweetData) < 5){
@@ -60,9 +60,9 @@ ntwitterPerTimeFrame <- function(searchString,startDate,endDate,timeframe='hour'
   
   mtitle <- paste("Number of Tweets per",timeframe)
   
-  pp <- ggplot(data=myTweetDF, aes(x=created,y=V1,fill=searchString)) + geom_bar(aes(col=searchString),stat='identity') 
+  pp <- ggplot(data=myTweetDF, aes(x=created,y=V1,fill=searchString)) + geom_bar(aes(col=searchString),stat='identity')
   pp <- pp + xlab('Time') + ylab('Number of Tweets') + opts(title=mtitle)
   
-  pp 
+  pp
   
 }

@@ -2,10 +2,11 @@
 \alias{drawWordIGraph}
 \title{Draws Word Graph}
 \usage{
-  drawWordIGraph(searchString, startDate, endDate,
+  drawWordIGraph(conn = NULL, searchString, startDate, endDate,
     sparse = 0.95)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character string to be wordclouded}
 
   \item{startDate}{A character string of the start date, eg

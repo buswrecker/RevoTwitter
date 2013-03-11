@@ -2,10 +2,11 @@
 \alias{sentimentFeedByTime}
 \title{Draw Sentiment Analysis}
 \usage{
-  sentimentFeedByTime(searchString, startDate, endDate,
-    window = 100, timeframe = "hour")
+  sentimentFeedByTime(conn = NULL, searchString, startDate, endDate,
+    window = 2, timeframe = "hour")
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character vector of searchStrings}
 
   \item{startDate}{A character string of the start date, eg
@@ -32,6 +33,6 @@
   Julian Lee \email{julian.lee@revolutionanalytics.com}
 }
 \seealso{
-  \code{\link{nTwitterPerTimeFrame}}
+  \code{\link{ntwitterPerTimeFrame}}
 }
 

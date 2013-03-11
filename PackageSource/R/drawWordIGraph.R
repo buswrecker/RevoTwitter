@@ -32,24 +32,23 @@
 #' 
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 
-drawWordIGraph <- function(searchString,startDate,endDate,sparse=0.95){
+drawWordIGraph <- function(conn=NULL,searchString,startDate,endDate,sparse=0.95){
+  if (is.null(conn)) {
+	  stop("Database connection not specified")
+  }
   
   require(igraph)
   
   ##0.1.1 - remove white spaces
   tableName <- gsub('\\s|@*#*','',searchString)
   
-  ##Grab Data
-  m <- dbDriver("SQLite")
-  con <- dbConnect(m, dbname = options('revoSQLiteFile')[[1]])
-  
   SQLstatement <- paste('SELECT text from ',tableName,
                         ' WHERE created BETWEEN "',
                         startDate, '" AND "', endDate, '"', sep='')
   
-  tweetData <- dbGetQuery(con, SQLstatement)
+  tweetData <- dbGetQuery(conn, SQLstatement)
   
-  dbDisconnect(con)
+  dbDisconnect(conn)
   
   ##Check volume of data
   if(nrow(tweetData) < 10){

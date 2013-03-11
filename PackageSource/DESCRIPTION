@@ -11,7 +11,7 @@ Depends:
     tm,
     XML,
     DBI,
-    TTR,RSQLite,stringr,igraph,plyr
+    TTR,stringr,igraph,plyr
 Description: This package provides all the functionality required to run
     activecitizen.com
 License: GPL-3

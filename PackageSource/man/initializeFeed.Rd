@@ -2,9 +2,10 @@
 \alias{initializeFeed}
 \title{Initialize Twitter Feed into SQLite}
 \usage{
-  initializeFeed(searchString, N = 1500)
+  initializeFeed(conn = NULL, searchString, N = 1500)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A string that is to be searched on
   Twitter.}
 

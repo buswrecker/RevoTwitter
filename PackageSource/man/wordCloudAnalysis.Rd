@@ -2,9 +2,11 @@
 \alias{wordCloudAnalysis}
 \title{Draw a WordCloud}
 \usage{
-  wordCloudAnalysis(searchString, startDate, endDate, ...)
+  wordCloudAnalysis(conn=NULL, searchString, focusString=NULL, startDate, endDate, type='ALL', ...)
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
+
   \item{searchString}{A character string to be wordclouded}
 
   \item{startDate}{A character string of the start date, eg

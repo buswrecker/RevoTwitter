@@ -2,10 +2,11 @@
 \alias{ntwitterPerTimeFrame}
 \title{Draw Volume of Tweets}
 \usage{
-  ntwitterPerTimeFrame(searchString, startDate, endDate,
+  ntwitterPerTimeFrame(conn = NULL, searchString, startDate, endDate,
     timeframe = "hour")
 }
 \arguments{
+  \item{conn}{A DBI-compatible database connecttion}
   \item{searchString}{A character vector of searchStrings}
 
   \item{startDate}{A character string of the start date, eg
