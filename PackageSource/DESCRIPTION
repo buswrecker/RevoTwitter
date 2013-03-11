@@ -1,7 +1,7 @@
 Package: RevoTwitter
 Type: Package
-Title: RevoTwitter to populate sqlite database
-Version: 0.2.2
+Title: RevoTwitter to populate database with tweets
+Version: 0.2.3
 Date: 19/1/2013
 Author: Revolution Analytics
 Maintainer: Julian Lee <julian.lee@revolutionanalytics.com>

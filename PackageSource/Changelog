@@ -9,3 +9,6 @@
 	* New SentimentFeedByTime features
 	* New SentimentFeedPunggol function
 	* Minor bug fixes with plots and wordclouds
+11/03/2013
+  * Normalize endline so the package can be developed in both Windows and Linux
+	* Make the database connection agnostic
