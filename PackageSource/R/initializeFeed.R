@@ -89,8 +89,8 @@ initializeFeed <- function(conn=NULL, searchString, N=1500){
   ##Ensure that field types are correct
   SUCCESS <- dbWriteTable(conn, tableName, tweetData,
                 row.names=F,
-                field.types=list(text='TEXT',favourited='INTEGER',
-                  replyToSN='INTEGER',created='DATETIME',truncated='INTEGER',
+                field.types=list(text='TEXT',favourited='BOOLEAN',
+                  replyToSN='INTEGER',created='TIMESTAMP',truncated='BOOLEAN',
                   replytoSID='TEXT',id='TEXT',replyToUID='INTEGER',
                   statusSource='TEXT',screenName='TEXT',
                   score='INTEGER',searchString='TEXT'))
