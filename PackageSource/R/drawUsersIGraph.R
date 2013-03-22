@@ -44,7 +44,7 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab Data
-  SQLstatement <- paste('SELECT text, screenName from ',tableName,
+  SQLstatement <- paste('SELECT "text", "screenName" from ',tableName,
                         ' WHERE created BETWEEN \'',
                         startDate, '\' AND \'', endDate, '\'', sep='')
   

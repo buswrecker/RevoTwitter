@@ -40,11 +40,12 @@ ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timefr
   ##0.1.1 - remove white spaces
   tableName <- gsub('\\s|@*#*','',searchString)
   
-  SQLstatement <- paste('SELECT created,searchString from ',tableName,
+  SQLstatement <- paste('SELECT "created","searchString" from ',tableName,
                         ' WHERE created BETWEEN \'',
                         startDate, '\' AND \'', endDate, '\'', sep='')
   
-  tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
+  tweetData <- dbGetQuery(conn,SQLstatement)
+  #tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
   dbDisconnect(conn)
   

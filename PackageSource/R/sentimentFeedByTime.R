@@ -46,7 +46,7 @@ sentimentFeedByTime <- function(conn=NULL,searchString,startDate, endDate, windo
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  SQLstatement <- paste('SELECT created,score,searchString from ',tableName,
+  SQLstatement <- paste('SELECT "created","score","searchString" from ',tableName,
                         ' WHERE created BETWEEN \'',
                         startDate, '\' AND \'', endDate, '\'', sep='')
   
