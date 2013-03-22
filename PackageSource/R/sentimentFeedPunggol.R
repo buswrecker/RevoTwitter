@@ -48,8 +48,8 @@ sentimentFeedPunggol <- function(conn=NULL,searchString, startDate, endDate, win
   
   ##Grab the Data
   SQLstatement <- paste('SELECT text,created,score,searchString from ',tableName,
-                        ' WHERE created BETWEEN "',
-                        startDate, '" AND "', endDate, '"', sep='')
+                        ' WHERE created BETWEEN \'',
+                        startDate, '\' AND \'', endDate, '\'', sep='')
   
   tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   

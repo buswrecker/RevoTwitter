@@ -37,7 +37,9 @@ initializeFeed <- function(conn=NULL, searchString, N=1500){
   data(dictionary)
   
   ##Curl web to get only ENGLISH tweets
+  cat('Before get new twit\n')
   tweetData <- searchTwitter(searchString,n=N,lan='en')
+  cat('After get new twit\n')
   
   if(length(tweetData)==0){
     cat('No Such Entry\n')
@@ -52,7 +54,11 @@ initializeFeed <- function(conn=NULL, searchString, N=1500){
   grepList <-grep('[\x80-\xFF]',tweetData$text,useBytes=T)
   if(length(grepList)!=0){
     tweetData<-tweetData[-grepList,]}
-  
+  tweetData$text=sapply(tweetData$text,function(row) iconv(row,to='UTF-8'))
+  tweetData$replyToSID=sapply(tweetData$replyToSID,function(row) iconv(row,to='UTF-8'))
+  tweetData$statusSource=sapply(tweetData$statusSource,function(row) iconv(row,to='UTF-8'))
+  tweetData$screenName=sapply(tweetData$screenName,function(row) iconv(row,to='UTF-8'))
+
   ##Manipulate Sources for Human Readable
   sources <- gsub(";&gt;", ">", tweetData$statusSource)
   sources <- gsub("&lt;/a&gt", ">", sources)

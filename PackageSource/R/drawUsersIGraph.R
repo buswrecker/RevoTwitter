@@ -45,8 +45,8 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
   
   ##Grab Data
   SQLstatement <- paste('SELECT text, screenName from ',tableName,
-                        ' WHERE created BETWEEN "',
-                        startDate, '" AND "', endDate, '"', sep='')
+                        ' WHERE created BETWEEN \'',
+                        startDate, '\' AND \'', endDate, '\'', sep='')
   
   tweetData <- dbGetQuery(conn, SQLstatement)
   

@@ -41,8 +41,8 @@ ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timefr
   tableName <- gsub('\\s|@*#*','',searchString)
   
   SQLstatement <- paste('SELECT created,searchString from ',tableName,
-                        ' WHERE created BETWEEN "',
-                        startDate, '" AND "', endDate, '"', sep='')
+                        ' WHERE created BETWEEN \'',
+                        startDate, '\' AND \'', endDate, '\'', sep='')
   
   tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   

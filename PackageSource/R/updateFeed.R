@@ -53,8 +53,10 @@ updateFeed <- function(conn=NULL,searchString,N=100){
   rs <- dbGetQuery(conn, SQLstatement)
   ##dbClearResult(rs)
   
+  cat('Before get updated twit\n')
   tweetData <- searchTwitter(searchString,n=N,lan='en',
           sinceID=rs$id[1])
+  cat('After get updated twit\n')
   
   if(length(tweetData)==0){
     cat('Feed is Upto Date\n')
@@ -66,6 +68,7 @@ updateFeed <- function(conn=NULL,searchString,N=100){
   grepList <-grep('[\x80-\xFF]',tweetData$text,useBytes=T)
   if(length(grepList)!=0){
     tweetData<-tweetData[-grepList,]}
+  tweetData$text=sapply(tweetData$text,function(row) iconv(row,to='UTF-8'))
   
   ##If no tweets are returned, then return the original list
   if(nrow(tweetData)==0){

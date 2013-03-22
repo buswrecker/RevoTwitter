@@ -51,8 +51,8 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   
   ##Grab the Data
   SQLstatement <- paste('SELECT text,score FROM ',tableName,
-                        ' WHERE created BETWEEN "',
-                        startDate, '" AND "', endDate, '"', sep='')
+                        ' WHERE created BETWEEN \'',
+                        startDate, '\' AND \'', endDate, '\'', sep='')
   
   tweetData <- dbGetQuery(conn,SQLstatement)
   ##tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
@@ -108,6 +108,7 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   
   
   v <- sort(rowSums(m),decreasing=TRUE)
+  v <- head(v, 20)
   d <- data.frame(word = names(v),freq=v)
   
   ##comparison.cloud(m,max.words=250,random.order=F)
@@ -116,4 +117,5 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
               c(5,.2),2,500,random.order=F,random.color=T,
               rot.per=.35,main=paste("WordCloud of",searchString),colors=brewer.pal(8,"Dark2"))
     
+  return(d)
 }
