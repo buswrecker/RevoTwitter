@@ -52,7 +52,7 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   ##Grab the Data
   SQLstatement <- paste('SELECT text,score FROM ',tableName,
                         ' WHERE created BETWEEN \'',
-                        startDate, '\' AND \'', endDate, '\'', sep='')
+                        startDate, '\' AND date \'', endDate, '\' + 1', sep='')
   
   tweetData <- dbGetQuery(conn,SQLstatement)
   ##tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
@@ -87,9 +87,7 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   
   ##Check volume of data
   if(nrow(tweetData) < 3){
-    plot(0:1,0:1,xaxt='n',yaxt='n',bty='n',pch='',xlab='',ylab='')
-    text(0.5,0.5,'Insufficient Data - Select Larger Date Range',cex=1.2)
-    return()
+    stop('Insufficient Data - Select Larger Date Range')
   }
   
   ##compileTweets <- daply(tweetData,'searchString',function(x) return(paste(x$text,collapse=';'))) 
@@ -106,10 +104,13 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   m <- as.matrix(tdm)
   #colnames(m) <- names(compileTweets)
   
-  
   v <- sort(rowSums(m),decreasing=TRUE)
-  v <- head(v, 20)
-  d <- data.frame(word = names(v),freq=v)
+  if (!is.null(v)) {
+    d <- data.frame(word = names(v),freq=v)
+  } else {
+    stop("No data available")
+    return()
+  }
   
   ##comparison.cloud(m,max.words=250,random.order=F)
   

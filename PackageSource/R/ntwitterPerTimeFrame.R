@@ -42,7 +42,7 @@ ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timefr
   
   SQLstatement <- paste('SELECT "created","searchString" from ',tableName,
                         ' WHERE created BETWEEN \'',
-                        startDate, '\' AND \'', endDate, '\'', sep='')
+                        startDate, '\' AND date \'', endDate, '\' + 1', sep='')
   
   tweetData <- dbGetQuery(conn,SQLstatement)
   #tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
@@ -51,9 +51,7 @@ ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timefr
   
   ##Check volume of data
   if(nrow(tweetData) < 5){
-    plot(0:1,0:1,xaxt='n',yaxt='n',bty='n',pch='',xlab='',ylab='')
-    text(0.5,0.5,'Insufficient Data - Select Larger Date Range',cex=1.2)
-    return()
+    stop('Insufficient Data - Select Larger Date Range')
   }
   tweetData$created <- trunc(as.POSIXct(tweetData$created,tz='Singapore'),timeframe)
   
@@ -64,6 +62,8 @@ ntwitterPerTimeFrame <- function(conn=NULL,searchString,startDate,endDate,timefr
   pp <- ggplot(data=myTweetDF, aes(x=created,y=V1,fill=searchString)) + geom_bar(aes(col=searchString),stat='identity')
   pp <- pp + xlab('Time') + ylab('Number of Tweets') + opts(title=mtitle)
   
-  pp
-  
+  print(pp)
+
+  myTweetDF$created <- unclass(as.POSIXct(myTweetDF$created)) * 1000
+  return(myTweetDF)
 }

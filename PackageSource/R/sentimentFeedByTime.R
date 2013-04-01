@@ -48,7 +48,7 @@ sentimentFeedByTime <- function(conn=NULL,searchString,startDate, endDate, windo
   ##Grab the Data
   SQLstatement <- paste('SELECT "created","score","searchString" from ',tableName,
                         ' WHERE created BETWEEN \'',
-                        startDate, '\' AND \'', endDate, '\'', sep='')
+                        startDate, '\' AND date \'', endDate, '\' + 1', sep='')
   
   tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
@@ -56,9 +56,7 @@ sentimentFeedByTime <- function(conn=NULL,searchString,startDate, endDate, windo
   
   ##Check volume of data
   if(nrow(tweetData) < 5){
-    plot(0:1,0:1,xaxt='n',yaxt='n',bty='n',pch='',xlab='',ylab='')
-    text(0.5,0.5,'Insufficient Data - Select Larger Date Range',cex=1.2)
-    return()
+    stop('Insufficient Data - Select Larger Date Range')
   }
   
   tweetData$created <- as.POSIXct(tweetData$created,tz='Singapore')
@@ -91,11 +89,13 @@ sentimentFeedByTime <- function(conn=NULL,searchString,startDate, endDate, windo
   tmp <- split(tweetData, as.factor(tweetData$searchString))
   tmp2 <- do.call('c',lapply(tmp,function(x) SMA(x$score,n=window)))
   tweetData2 <- cbind(tweetData,smoothed=tmp2)
-  
 
   pp <- ggplot(data=tweetData2, aes(x=created,y=smoothed,group=searchString)) + geom_hline(aes(yintercept=0),linetype='dotted')
   pp <- pp + geom_line(aes(colour=searchString),linetype=1,size=1.3) + xlab('Time of Analysis') + ylab('Overall Sentiment')
   pp <- pp + scale_x_datetime(labels=date_format('%m/%d %H')) +  opts(title=paste('Moving Average,n=',window,sep=''))
-  pp
-  #return(mySUM)
+  print(pp)
+  res <- data.frame(unclass(tweetData2$created)*1000, tweetData2$smoothed)
+  names(res)[1] <- 'created'
+  names(res)[2] <- 'smoothed'
+  return(res[-1,])
 }

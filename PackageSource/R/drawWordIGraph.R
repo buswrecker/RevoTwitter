@@ -44,7 +44,7 @@ drawWordIGraph <- function(conn=NULL,searchString,startDate,endDate,sparse=0.95)
   
   SQLstatement <- paste('SELECT text from ',tableName,
                         ' WHERE created BETWEEN \'',
-                        startDate, '\' AND \'', endDate, '\'', sep='')
+                        startDate, '\' AND date \'', endDate, '\' + 1', sep='')
   
   tweetData <- dbGetQuery(conn, SQLstatement)
   
