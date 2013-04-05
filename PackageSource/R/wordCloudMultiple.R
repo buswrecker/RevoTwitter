@@ -43,7 +43,7 @@ wordCloudMultiple <- function(conn=NULL,searchString){
   tableName <- gsub('\\s|@*#*','',searchString)
   
   ##Grab the Data
-  SQLstatement <- paste('SELECT created,text,searchString from ',tableName,
+  SQLstatement <- paste('SELECT "created","text","searchString" from ',tableName,
                         "ORDER BY id DESC limit 20")
   
   tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
@@ -63,7 +63,6 @@ wordCloudMultiple <- function(conn=NULL,searchString){
   tdm <- TermDocumentMatrix(text.corpus)
   m <- as.matrix(tdm)
   colnames(m) <- names(compileTweets)
-  
   
   v <- sort(rowSums(m),decreasing=TRUE)
   d <- data.frame(word = names(v),freq=v)
