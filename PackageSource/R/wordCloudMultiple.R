@@ -33,6 +33,11 @@
 #' @author Julian Lee \email{julian.lee@@revolutionanalytics.com}
 #' 
 wordCloudMultiple <- function(conn=NULL,searchString){
+  searchString <- gsub('[^0-9a-z\\s]', '', searchString, ignore.case=TRUE, perl=TRUE)
+  if (searchString=='') {
+	  stop("Invalid searchString")
+  }
+
   if (is.null(conn)) {
 	  stop("Database connection not specified")
   }
