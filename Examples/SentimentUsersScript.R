@@ -5,5 +5,9 @@ createConnection <- function() {
   return(dbConnect(dbDriver("PostgreSQL"), dbname="active_citizen", user="dev", host="localhost"))
 }
 
-conn <- createConnection()
-res <- sentimentFeedByTime(conn, searchString, startDate, endDate)
+tryCatch({
+  conn <- createConnection()
+  res <- sentimentFeedByTime(conn, searchString, startDate, endDate)
+}, error=function(err) {
+  paste("Error: ", err)
+})
