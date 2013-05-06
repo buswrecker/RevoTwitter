@@ -72,12 +72,12 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
     # get tweet with retweet entity
     twit = tweetData$text[rt_patterns[i]]
     # get retweet source
-    poster = str_extract_all(twit,
-                             "(RT|via)((?:\\b\\W*@\\w+)+)")
+    poster = str_extract(twit,
+                             "(RT|via)(?:\\b\\W*@\\w+)")
     #remove ':'
     poster = gsub(":", "", unlist(poster))
     # name of retweeted user
-    who_post[[i]] = gsub("(RT @|via @)", "", poster, ignore.case=TRUE)
+    who_post[[i]] = gsub("(RT @|via @)", "", poster, ignore.case=TRUE)[[1]]
     # name of retweeting user
     who_retweet[[i]] = rep(tweetData$screenName[rt_patterns[i]], length(poster))
   }
@@ -86,15 +86,36 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
   who_post = unlist(who_post)
   who_retweet = unlist(who_retweet)
   
+  post_freq <- as.data.frame(table(who_post), stringsAsFactors=FALSE)
+  top_posters <- post_freq[order(-post_freq$Freq),]$who_post[1:5]
   # two column matrix of edges
   retweeter_poster = cbind(who_retweet, who_post)
+  retweeter_poster <- retweeter_poster[who_post %in% top_posters,]
+  edges = matrix(nrow=0, ncol=2)
+  colnames(edges) <- c("who_retweet", "who_post")
+  for (i in 1:length(top_posters))
+  {
+    retweeters <- retweeter_poster[retweeter_poster[,"who_post"]==top_posters[i],]
+    post_retweeters <- retweeters[retweeters[, "who_retweet"] %in% who_post,]
+    retweeters <- retweeters[!(retweeters[, "who_retweet"] %in% who_post),]
+    if (is.null(nrow(post_retweeters))) {
+      post_retweeters = matrix(nrow=0, ncol=2)
+      colnames(post_retweeters) <- c("who_retweet", "who_post")
+    }
+    if (nrow(post_retweeters) < 5) {
+      post_retweeters <- rbind(post_retweeters, retweeters)
+    }
+    if (nrow(post_retweeters) > 5)
+      post_retweeters <- post_retweeters[1:5,]
+    edges <- rbind(edges, post_retweeters)
+  }
   
   # generate graph
-  rt_graph = graph.edgelist(retweeter_poster)
+  rt_graph = graph.edgelist(edges)
   
   # get vertex names
   ver_labs = get.vertex.attribute(rt_graph, "name", index=V(rt_graph))
-  ver_labs <- tolower(substring(ver_labs,0,11))
+  ver_labs <- tolower(substring(ver_labs,0,20))
   
   # choose some layout
   glay = layout.fruchterman.reingold(rt_graph)
