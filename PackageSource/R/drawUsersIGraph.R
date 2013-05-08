@@ -133,4 +133,6 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
   plot(rt_graph,layout=glay)
   title(paste("\nFollowers on",searchString),
         cex.main=1, col.main="black")
+
+  return(edges)
 }
