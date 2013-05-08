@@ -41,14 +41,10 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   
   require(wordcloud)
   
-  ##0.2.1 - politicians
-  politicians <- c('Koh Poh Koon','Lee Li Lian','Kenneth Jeyaretnam','Desmond Lim')
-  politicians <- tolower(do.call('c',strsplit(politicians,' ')))
-  politicians <- c(politicians,'punggoleast','byelection')
-  
   ##0.1.1 - remove white spaces
   tableName <- gsub('\\s|@*#*','',searchString)
-  
+  print("Getting data from db")
+  print(proc.time())
   ##Grab the Data
   SQLstatement <- paste('SELECT text,score FROM ',tableName,
                         ' WHERE created BETWEEN \'',
@@ -57,24 +53,10 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   tweetData <- dbGetQuery(conn,SQLstatement)
   ##tweetData <- do.call("rbind",lapply(SQLstatement,function(x) dbGetQuery(conn,x)))
   
+  print("Data retrieved")
+  print(proc.time())
+  print(nrow(tweetData))
   dbDisconnect(conn)
-  
-  ##If focusstring is not null
-  if(!is.null(focusString)){
-    if(focusString=='PAP'){
-      ssIndex <-  grep('[pP][aA][pP] | [kK][oO][hH]',tweetData$text)
-    }else if(focusString=='WP'){
-      ssIndex <- grep('[wW][pP][sS]*[gG]* | [lL][eE]{2}',tweetData$text)
-    }else if(focusString=='RP'){
-      ssIndex <- grep('[rR][pP] | Kenneth',tweetData$text)
-    }else if(focusString=='SDA'){
-      ssIndex <- grep('[sS][dD][aA] | [Ll][iI][mM]',tweetData$text)
-    }else{
-      return("No Known focusString")
-    }
-    
-    tweetData <- tweetData[ssIndex,]
-  }
   
   ##If you want wordcloud of positive,negative or neutral tweets
   if(type=='POS'){
@@ -87,36 +69,55 @@ wordCloudAnalysis <- function(conn=NULL,searchString,focusString=NULL,startDate,
   
   ##Check volume of data
   if(nrow(tweetData) < 3){
-    stop('Insufficient Data - Select Larger Date Range')
+    stop('Insufficient Data')
   }
   
   ##compileTweets <- daply(tweetData,'searchString',function(x) return(paste(x$text,collapse=';'))) 
   
+  print("Filter out text")
+  print(proc.time())
+  tweetData$text <- lapply(tweetData$text, RemoveAtPeople)
+  tweetData$text <- lapply(tweetData$text, tolower)
+  tweetData$text <- lapply(tweetData$text, removePunctuation)
+  tweetData$text <- lapply(tweetData$text, RemoveHTTP)
+
+  print("Filter out stop words")
+  print(proc.time())
+  stopWords <- c('amp', 'yahoo', 'singapore', stopwords('en'))
+  '%nin%' <- Negate('%in%')
+  tweetData$text <- lapply(tweetData$text, function(x) {
+      t <- unlist(strsplit(x, "\\s"))
+      paste(t[t %nin% stopWords], collapse=" ")
+  })
   ##Build Text Corpus
+  print("Building text corpus")
+  print(proc.time())
   text.corpus <- Corpus(VectorSource(tweetData$text))
-  text.corpus <- tm_map(text.corpus, RemoveAtPeople)
-  text.corpus <- tm_map(text.corpus, tolower)  
-  text.corpus <- tm_map(text.corpus, removePunctuation)
-  text.corpus <- tm_map(text.corpus, RemoveHTTP)
-  text.corpus <- tm_map(text.corpus, removeWords, c(searchString, politicians,'amp','yahoo','singapore',stopwords('en')))
+  #text.corpus <- tm_map(text.corpus, RemoveAtPeople)
+  #text.corpus <- tm_map(text.corpus, tolower)
+  #text.corpus <- tm_map(text.corpus, removePunctuation)
+  #text.corpus <- tm_map(text.corpus, RemoveHTTP)
   
+  print("Creating term matrix")
+  print(proc.time())
   tdm <- TermDocumentMatrix(text.corpus)
   m <- as.matrix(tdm)
   #colnames(m) <- names(compileTweets)
   
+  print("Counting and sorting words")
+  print(proc.time())
   v <- sort(rowSums(m),decreasing=TRUE)
   if (!is.null(v)) {
+    print("Preparing data to output")
+    print(proc.time())
     d <- data.frame(word = names(v),freq=v)
+    d <- d[1:300,]
   } else {
     stop("No data available")
     return()
   }
   
-  ##comparison.cloud(m,max.words=250,random.order=F)
-  
-  wordcloud(d$word,d$freq,
-              c(5,.2),2,500,random.order=F,random.color=T,
-              rot.per=.35,main=paste("WordCloud of",searchString),colors=brewer.pal(8,"Dark2"))
-    
+  print("Output data")
+  print(proc.time())
   return(d)
 }
