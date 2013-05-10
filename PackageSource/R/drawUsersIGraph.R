@@ -95,9 +95,10 @@ drawUsersIGraph <- function(conn=NULL,searchString,startDate,endDate){
   colnames(edges) <- c("who_retweet", "who_post")
   for (i in 1:length(top_posters))
   {
-    retweeters <- retweeter_poster[retweeter_poster[,"who_post"]==top_posters[i],]
-    post_retweeters <- retweeters[retweeters[, "who_retweet"] %in% who_post,]
-    retweeters <- retweeters[!(retweeters[, "who_retweet"] %in% who_post),]
+    print(i)
+    retweeters <- retweeter_poster[retweeter_poster[,"who_post"]==top_posters[i],, drop=FALSE]
+    post_retweeters <- retweeters[retweeters[, "who_retweet"] %in% who_post,,drop=FALSE]
+    retweeters <- retweeters[!(retweeters[, "who_retweet"] %in% who_post),,drop=FALSE]
     if (is.null(nrow(post_retweeters))) {
       post_retweeters = matrix(nrow=0, ncol=2)
       colnames(post_retweeters) <- c("who_retweet", "who_post")
